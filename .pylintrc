@@ -1,0 +1,8 @@
+[BASIC]
+good-names=df, i, x
+
+[FORMAT]
+max-line-length=150
+
+[TYPECHECK]
+ignored-classes=TextFileReader

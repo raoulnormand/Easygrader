@@ -1,3 +1,7 @@
+"""
+Utility files for the easygrader module.
+"""
+
 import pandas as pd
 import numpy as np
 
@@ -6,14 +10,14 @@ def format_file(file, file_type=None, input_col=None, info_col=None,
     """
     Utility function to format a csv file as described in the Gradebook class.
     """
-    
+
     if info_col is None:
         info_col = {}
         info_col['last'] = 'Last Name'
         info_col['first'] = 'First Name'
         info_col['id'] = 'ID'
         info_col['email'] = 'Email'
-    
+
     if file_type == 'GS':
         input_col = {}
         input_col['full'] = 'Name'

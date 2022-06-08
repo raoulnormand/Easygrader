@@ -35,7 +35,8 @@ class GradingScheme:
             self.scheme = func
         elif scheme == 'weights':
             if isinstance(arg, dict):
-                self.scheme = lambda x: sum([x[key]*value for (key, value) in arg.items()])/sum(arg.values())
+                self.scheme = lambda x: sum([x[key]*value for
+                        (key, value) in arg.items()])/sum(arg.values())
             else:
                 self.scheme = lambda x: (x*arg).sum()/sum(arg)
         else:
@@ -131,7 +132,8 @@ class Assignment:
 
         # check that the lengths match
         if len(self.max_points) != self.nb_tests or len(self.nb_versions) != self.nb_tests:
-            raise Exception('max_points and nb_versions should be a int / float or a list of nb_tests size')
+            raise Exception('max_points and nb_versions should be a \
+                                int / float or a list of nb_tests size')
 
         if nb_tests is None:
             # name is just the name
@@ -271,7 +273,7 @@ class Course:
         _grading_scheme: a GradingScheme or list of GradingSchemes,
         to compute the grade form the average of each assignment.
         If a list is given, returns the max of the result obtained
-        by each GradingScheme.   
+        by each GradingScheme.
         _thresholds: a list in decreeasing order. These are the thresholds between
             each letter grade. A grade at the threshold is given the higher lettr grade.
             Defaults to [93, 90, 87, 83, 80, 75, 65, 50]
@@ -284,7 +286,7 @@ class Course:
         where 'tests' would include the result of each individual test.
         _include_others: name of other columns to include, e.g. 'Comments'.
         """
-        
+
         # Standard grading_scheme
         if grading_scheme is None:
             grading_scheme = [GradingScheme()]
@@ -306,7 +308,7 @@ class Course:
         # Thresholds should separate letter grades, warn if lengths do not match
         if len(thresholds) != len(letters) - 1:
             print('Incorrect sizes of threshold and letters.\
-                    There should be n letter grades and n-1 thresholds.')                       
+                    There should be n letter grades and n-1 thresholds.')            
 
         # Default inclusion: averages, missed assignments, final grade, letter grade
         if include is None:
@@ -328,7 +330,7 @@ class Course:
 
         grades = self.grades.copy()
         grades.replace(np.nan, 0, inplace=True)
-        
+
         # Create a df containing the tests results
 
         if 'tests' in include:
@@ -342,18 +344,18 @@ class Course:
             for assignment in self.assignments:
                 test_names = [test.name for test in assignment.tests]
                 dfs['averages'][assignment.name] = grades.apply(lambda x, test_names=test_names, assignment=assignment:
-                                                    max(gs.scheme(x[test_names]/assignment.max_points) for gs in assignment.grading_scheme)*assignment.scaling,
-                                                    axis=1)
+                                    max(gs.scheme(x[test_names]/assignment.max_points) for gs in assignment.grading_scheme)\
+                                    *assignment.scaling, axis=1)
                 unscaled_averages[assignment.name] = dfs['averages'][assignment.name]/assignment.scaling
 
         # Create a df containg the final grade
 
         if 'final' in include or 'letter' in include:
             dfs['final']['Final grade'] = unscaled_averages.apply(lambda x: max(gs.scheme(x) for gs in grading_scheme)*100, axis=1)
-            
+
         # Create a df containg the letter grades
 
-        if 'letter' in include:    
+        if 'letter' in include:
             dfs['letter']['Letter grade'] = dfs['final'].apply(lambda x: letter_conversion(x['Final grade'], thresholds, letters), axis=1)
 
         # Create a df containing the rest of the columns
@@ -373,7 +375,7 @@ def create_import(input_path, output_path, info_col=None, letter_grade_col='Lett
     """
     Creates a .csv file to import directly to Brightspace.
     """
-    
+
     # Standard info columns
     if info_col is None:
         info_col = {}
@@ -389,30 +391,30 @@ def create_import(input_path, output_path, info_col=None, letter_grade_col='Lett
     # Standard letter grades
     if letters is None:
         letters = ['A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'D', 'F']
-    
+
     df = pd.read_csv(input_path)
     username = 'Username'
     final_grade_num = 'Adjusted Final Grade Numerator'
     final_grade_denom = 'Adjusted Final Grade Denominator'
     eol = 'End-Of-Line Indicator'
-    PG = ' Points Grade'
+    pg_col = ' Points Grade'
 
     if include_others is None:
         include_others = []
 
     info_col_names = [info_col['last'], info_col['first'], info_col['email']]
-    columns = [username] + info_col_names + [col + PG for col in include_others] + [final_grade_num, final_grade_denom, eol]
+    columns = [username] + info_col_names + [col + pg_col for col in include_others] + [final_grade_num, final_grade_denom, eol]
 
     output = pd.DataFrame(index=df.index, columns=columns)
 
     output[username] = df.apply(lambda x: '#' + x[info_col['id']], axis=1)
-    output[info_col_names] = df[info_col_names]
+    output[info_col_names] = df.info_col_names
     for col in include_others:
-        output[col + PG] = df[col]
+        output[col + pg_col] = df.col
     if standardize:
         output[final_grade_num] = df.apply(lambda x: inverse_conversion(x[letter_grade_col], thresholds=thresholds, letters=letters), axis=1)
     else:
-        output[final_grade_num] = df[letter_grade_col]
+        output[final_grade_num] = df.letter_grade_col
     output[final_grade_denom] = 100
     output[eol] = '#'
     output.to_csv(output_path, index=False)
