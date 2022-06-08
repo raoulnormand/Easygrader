@@ -11,7 +11,7 @@ from utils import format_file, test_score, letter_conversion, inverse_conversion
 
 class GradingScheme:
     """
-    Class describing a grading scheme. Can be applied to an assignment, or to a class.
+    Class describing a grading scheme. Can be applied to an assignment or to a Course.
     The scheme is applied row by row:
         _for an Assignment, it is applied to all Test
         _for a Course, it is applied to the average of each assignment
@@ -168,12 +168,11 @@ class Gradebook:
             to be the username of the email. If both are missing, an exception is raised.
         _file_type: standard formatting for Gradescope ('GS') or WebAssign ('WA')
         _input_col: a dictionary with keys 'first' and 'last' (two columns for first and last name)
-            or 'full' (one column for the full name),
-            'id', and 'email'.
+            or 'full' (one column for the full name), 'id', and 'email'.
             The values are the name of the corresponding columns in the file.
-        _info_col: same format as input_col. The values are the name of the
-            columns in the DataFrame that is created. Defaults are 'Last Name',
-            'First Name', 'ID', 'Email'
+        _info_col: a dictionary with keys 'first', 'last', 'id', and 'email'.
+            The values are the name of the columns in the DataFrame that is created.
+            Defaults are 'Last Name', 'First Name', 'ID', 'Email'.
         _last_name_first: True if the file has a full name column and the first name
             appears first.
         _name_separator: if the file has a full name column, the character(s)
@@ -195,7 +194,6 @@ class Course:
     gradebooks, they will not be added.
 
     Parameters:
-    _assignments: a list of assignments in the class
     _assignments: a list of the assignments in the class
     _gradebooks: single Gradebook file, or list of Gradebook files
 
@@ -280,7 +278,7 @@ class Course:
         _letters: the letters grades in decreasing opder. Defaults to
             ['A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'D', 'F']
         _include: the columns to include. If None, includes the average
-        of each Assignmne,t the number of assignment missed, the
+        of each Assignmnent the number of assignment missed, the
         final grade, and the letter grade.
         Otherwise, can be any sublist of ['tests', 'averages', 'final', 'letter', 'missed'],
         where 'tests' would include the result of each individual test.
@@ -308,7 +306,7 @@ class Course:
         # Thresholds should separate letter grades, warn if lengths do not match
         if len(thresholds) != len(letters) - 1:
             print('Incorrect sizes of threshold and letters.\
-                    There should be n letter grades and n-1 thresholds.')            
+                    There should be n letter grades and n-1 thresholds.')      
 
         # Default inclusion: averages, missed assignments, final grade, letter grade
         if include is None:
@@ -370,10 +368,22 @@ class Course:
         return df
 
 
-def create_import(input_path, output_path, info_col=None, letter_grade_col='Letter grade', standardize=True,
-                     thresholds=None, letters=None, include_others=None):
+def create_import(input_path, output_path, info_col=None, letter_grade_col='Letter grade',
+                     thresholds=None, letters=None, standardize=True, include_others=None):
     """
-    Creates a .csv file to import directly to Brightspace.
+    Creates a .csv file to import directly to the Brightspace gradebook.
+
+    Parameters:
+    _input_path: the path to the input file
+    _output_path: the path to the output file
+    _info_col: a dictionary containing the name of the info columns
+    _letter_grade_col: the header of the column containing the letter grades
+    _thresholds: as for the compute_grades method
+    _letters: as for the compute_grades method
+    _standardize: if False, the "Final grade" column in the output file is the 'Final grade' column of the input file.
+    Otherwise, it is deduced from the letter grade. FOr instance, if the threshold for a B is 80 to 83,
+    then all students with a B will get a Final grade of 81.5.
+    _include_others: a list of the other columns to include, e.g. the grade of the final exam  
     """
 
     # Standard info columns
@@ -408,13 +418,13 @@ def create_import(input_path, output_path, info_col=None, letter_grade_col='Lett
     output = pd.DataFrame(index=df.index, columns=columns)
 
     output[username] = df.apply(lambda x: '#' + x[info_col['id']], axis=1)
-    output[info_col_names] = df.info_col_names
+    output[info_col_names] = df[info_col_names]
     for col in include_others:
-        output[col + pg_col] = df.col
+        output[col + pg_col] = df[col]
     if standardize:
         output[final_grade_num] = df.apply(lambda x: inverse_conversion(x[letter_grade_col], thresholds=thresholds, letters=letters), axis=1)
     else:
-        output[final_grade_num] = df.letter_grade_col
+        output[final_grade_num] = df['Final grade']
     output[final_grade_denom] = 100
     output[eol] = '#'
     output.to_csv(output_path, index=False)

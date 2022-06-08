@@ -1,3 +1,7 @@
+"""
+This describes a typical use case of the easygrader module.
+"""
+
 # Import Path to deal with files
 from pathlib import Path
 
