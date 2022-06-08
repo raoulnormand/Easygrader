@@ -20,7 +20,7 @@ grade_file = folder / Path(r'Grades2.csv')
 
 # Create the gradebooks. The file_type describe the formatting,
 # that is the name used for the info columns and for the missing values.
-# More info in the Gradebook class. 
+# More info in the Gradebook class.
 GS_gradebook = Gradebook(file=GS_file, file_type='GS')
 WA_gradebook = Gradebook(file=WA_file, file_type='WA')
 rec_gradebook = Gradebook(file=rec_file, file_type='GS')
@@ -44,11 +44,12 @@ course_scheme = [GradingScheme('weights', [5, 15, 15, 5, 15, 15, 30]),
 # Define the Assignments
  # One column called 'WebAssign', rescaled to be out of 5 in the final gradebook.
 wa = Assignment(name='WebAssign', max_points=100, scaling=5)
-# 11 columns called HW 1, ..., HW 11, graded out of 20. Average calculated by dropping the two lowest grades.
+# 11 columns called HW 1, ..., HW 11, graded out of 20.
+# Average calculated by dropping the two lowest grades.
 hw = Assignment(name='HW', max_points=20, nb_tests=11, grading_scheme=drop2)
 # Similar, but with columns Quiz 1 - v1, Quiz 1  - v2, Quiz 2 - v1, ...
 # The two versions of each are collapsed into a single grade.
-quiz = Assignment(name='Quiz', max_points=20, nb_tests=10, nb_versions=2, grading_scheme=drop2) 
+quiz = Assignment(name='Quiz', max_points=20, nb_tests=10, nb_versions=2, grading_scheme=drop2)
 # Participation
 part = Assignment(name='Participation', max_points=5)
 # Instead of definition midterm with nb_tests = 2, we define two different assignments
@@ -71,7 +72,7 @@ grades.to_csv(grade_file, index=False)
 
 # At this point, we can modify the grade_file directly if desired, e.g. readjust letter grades
 # To this end, we add a column 'Adjusted letter grade'.
-# We could also do nothing and import directly. In this case, no need to 
+# We could also do nothing and import directly. In this case, no need to
 # include letter_grade_col, whcih defaults to 'Letter grade', as in the grade_file
 # We also include the final exam grade.
 # The file obtained can be directly uploaded to the brightspace Gradebook.

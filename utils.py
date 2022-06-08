@@ -31,7 +31,7 @@ def format_file(file, file_type=None, input_col=None, info_col=None,
 
     # Read the csv file as DataFrame
     file_as_df = pd.read_csv(file)
- 
+
     # Create the new DataFrame and replace all the missing values by np.nan
     df = pd.DataFrame(index=file_as_df.index)
     df.fillna(np.nan, inplace=True)

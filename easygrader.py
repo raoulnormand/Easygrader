@@ -1,7 +1,13 @@
-from utils import format_file, test_score, letter_conversion, inverse_conversion
+#pylint: disable=no-member
+"""
+Definition of classes and import function.
+"""
+
+from heapq import nlargest
 import pandas as pd
 import numpy as np
-from heapq import nlargest
+from utils import format_file, test_score, letter_conversion, inverse_conversion
+
 
 class GradingScheme:
     """
@@ -10,7 +16,7 @@ class GradingScheme:
         _for an Assignment, it is applied to all Test
         _for a Course, it is applied to the average of each assignment
             (where the average is calculated with a GradingScheme)
-    
+
     scheme can:
     _None (default) or 'mean': the average
     _'drop', with arg provided: drop the arg lowest
@@ -140,7 +146,7 @@ class Assignment:
 
 class Gradebook:
     """
-    Class for gradebooks.    
+    Class for gradebooks.
     A gradebook is merely a .csv file with a standard formatting.
 
     Attributes:
@@ -239,14 +245,14 @@ class Course:
         trimmed_gradebooks = [gradebook.df.loc[:, ~gradebook.df.columns.isin(self.roster.columns)] for gradebook in gradebooks]
         # Concatenate
         self.gradebook = pd.concat([self.roster] + trimmed_gradebooks, axis = 1).reindex(self.roster.index)
-        
+
         # Create the grades DataFrame, containing only the grades of the
         # assignments given, and with the different versions combined
 
         self.grades = self.roster.copy()
 
         self.tests = [test for assignment in assignments for test in assignment.tests]
-        
+
         for test in self.tests:
             self.grades[test.name] = self.gradebook.apply(lambda x, test=test: test_score(test.name, x[test.versions], x[info_col['id']]), axis=1)
 
