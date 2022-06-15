@@ -97,7 +97,7 @@ This returns a DataFrame whose index is the ID of the students, and with their n
 - `grading_scheme` is a GradingScheme that is applied to the average of each Assignment.
 - `thresholds` are the thresholds for the letter grades, in decreasing order.
 - `letters` are the letter grades, in decreaing order.
-- `include` are the columns to include, out of 'tests' (grades of each test), 'averages' (averages of each assignment), 'final' (final grade calculated with the Course GradinScheme), 'letter' (letter grades), 'missed' (number of each assigmnet missed). Does not include 'tests' by default,
+- `include` are the columns to include, out of 'tests' (grades of each test), 'averages' (averages of each assignment), 'final' (final grade calculated with the Course GradinScheme), 'letter' (letter grades), 'missed' (number of each assignment missed). Does not include 'tests' by default,
 - `include_others` are the name of other columns to include, e.g. 'Comments'.
 
 You can then import this file as a csv with
